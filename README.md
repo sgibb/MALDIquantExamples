@@ -13,6 +13,31 @@ different resolutions.
 
 Please visit: http://strimmerlab.org/software/maldiquant/
 
+## Details
+
+### MALDIquant examples
+
+- [Preprocessing and peak detection example.](https://github.com/sgibb/MALDIquantExamples/blob/master/processing-peaks.R)
+- [Mass calibration.](https://github.com/sgibb/MALDIquantExamples/blob/master/mass-calibration.R)
+- [Direct Infusion/Orbitrap workflow.](https://github.com/sgibb/MALDIquantExamples/blob/master/DIMS.R)
+
+
+- [R code to reproduce Figure 1 used in Gibb and Strimmer 2012](https://github.com/sgibb/MALDIquantExamples/blob/master/createFigure1.R)
+
+### MALDIquantForeign examples
+
+- [Data import using MALDIquantForeign.](https://github.com/sgibb/MALDIquantExamples/blob/master/import.R)
+
+
+### Demo files distributed with the MALDIquant R package
+- [Comparison of different baseline
+  corrections.](https://github.com/sgibb/MALDIquant/blob/master/demo/baseline.R)
+- [Peak detection and labeling.](https://github.com/sgibb/MALDIquant/blob/master/demo/peaks.R)
+- [Illustration of peak alignment by
+  warping.](https://github.com/sgibb/MALDIquant/blob/master/demo/warping.R)
+- [Example
+  workflow.](https://github.com/sgibb/MALDIquant/blob/master/demo/workflow.R)
+
 ## Download and Install
 
 Download the zip file:
