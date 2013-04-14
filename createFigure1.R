@@ -3,7 +3,7 @@
 ## This is a MALDIquant example file. It is released into public domain with the
 ## right to use it for any purpose but without any warranty.
 
-## This code was used to create Figure 1 in:
+## This code was used to create figure 1 in:
 ## S. Gibb and K. Strimmer. 2012. MALDIquant: a versatile R package for the
 ## analysis of mass spectrometry data. Bioinformatics 28: 2270-2271
 

@@ -22,7 +22,7 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 - [Direct Infusion/Orbitrap workflow.](https://github.com/sgibb/MALDIquantExamples/blob/master/DIMS.R)
 
 
-- [R code to reproduce Figure 1 used in Gibb and Strimmer 2012](https://github.com/sgibb/MALDIquantExamples/blob/master/createFigure1.R)
+- [R code to reproduce figure 1 used in Gibb and Strimmer 2012.](https://github.com/sgibb/MALDIquantExamples/blob/master/createFigure1.R)
 
 ### MALDIquantForeign examples
 
