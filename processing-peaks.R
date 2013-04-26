@@ -6,12 +6,11 @@ library("MALDIquant")
 
 
 #### DATA INPUT ####
-
-library("readBrukerFlexData")
-datapath = file.path( system.file("Examples",
-              package="readBrukerFlexData"), "2010_05_19_Gibb_C8_A1")
+library("MALDIquantForeign")
+datapath = file.path( system.file("Examples", package="readBrukerFlexData"),
+                     "2010_05_19_Gibb_C8_A1")
 dir(datapath)
-sA1 = mqReadBrukerFlex(datapath)
+sA1 = importBrukerFlex(datapath)
 par(mfrow=c(2, 1))
 lapply(sA1, plot)
 par(mfrow=c(1, 1))
