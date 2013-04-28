@@ -3,8 +3,8 @@
 ## This is a MALDIquant example file. It is released into public domain with the
 ## right to use it for any purpose but without any warranty.
 
-## This example file demonstrate the calibration of the x-axis (mass values)
-## using MALDIquant. 
+## This example file demonstrates the calibration of the x-axis (mass values)
+## using MALDIquant.
 ## The calibration of the x-axis is also known as alignment or warping.
 
 
@@ -43,7 +43,7 @@ peaks <- detectPeaks(spectra)
 ##############################################################################
 
 ## 1. create reference peaks (also known as landmark peaks;
-##    could be done automatically by determineWarpingFunctions or 
+##    could be done automatically by determineWarpingFunctions or
 ##    referencePeaks).
 refPeaks <- referencePeaks(peaks)
 ## 2. calculate individual warping functions.
@@ -57,7 +57,7 @@ peaks <- warpMassPeaks(peaks, warpingFunctions)
 ## second step: binning, or create identical mass values for same peaks
 ##############################################################################
 
-## after warping you get similar but not necessary identical mass values for 
+## after warping you get similar but not necessary identical mass values for
 ## the same peaks, e.g. for peak 8 in spectrum 1: 1077.630
 ##                  and for peak 6 in spectrum 2: 1077.670
 ##                                                ...

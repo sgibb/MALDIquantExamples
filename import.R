@@ -3,7 +3,7 @@
 ## This is a MALDIquantForeign example file. It is released into public
 ## domain with the right to use it for any purpose but without any warranty.
 
-## This example file demonstrate the import of different datasets
+## This example file demonstrates the import of different datasets
 ## using MALDIquantForeign.
 
 
