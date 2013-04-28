@@ -32,9 +32,9 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 - [Data import using MALDIquantForeign.](https://github.com/sgibb/MALDIquantExamples/blob/master/import.R)
 
 
-### IMS examples
+### Imaging Mass Spectrometry (IMS) examples
 
-- [Import imzML and display an image.](https://github.com/sgibb/MALDIquantExamples/blob/master/importImzMl.R)
+- [Import of imzML data and image display.](https://github.com/sgibb/MALDIquantExamples/blob/master/importImzMl.R)
 
 
 ### Demo files distributed with the MALDIquant R package
