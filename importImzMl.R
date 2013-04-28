@@ -1,3 +1,12 @@
+## 28 April 2013
+
+## This is a MALDIquant/MALDIquantForeign example file. It is released into
+## public domain with the right to use it for any purpose but without any
+## warranty.
+
+## This example file demonstrates the import of imzML files
+## using MALDIquantForeign and how to display an image from IMS data.
+
 ## load libraries
 library("MALDIquant")
 library("MALDIquantForeign") ## MALDIquantForeign >= 0.4 is needed
