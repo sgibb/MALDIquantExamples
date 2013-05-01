@@ -9,7 +9,14 @@
 
 ## load libraries
 library("MALDIquant")
-library("MALDIquantForeign") ## MALDIquantForeign >= 0.4 is needed
+
+## MALDIquantForeign >= 0.4 is needed
+library("MALDIquantForeign")
+
+if (packageVersion("MALDIquantForeign") < "0.4") {
+  stop("Your MALDIquantForeign (", packageVersion("MALDIquantForeign"),
+       ") is too old. You need to update MALDIquantForeign!")
+}
 
 ## define plot function
 plotImage <- function(x, range, main) {
