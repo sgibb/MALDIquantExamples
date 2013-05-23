@@ -23,6 +23,7 @@ plot(s)
 mass(s)      # extract m/z values
 intensity(s) # and corresponding intensities
 as.matrix(s) # convert to two-column matrix
+length(s)    # show number of m/z and intensity values
 
 #### PREPROCESSING ####
 
@@ -32,6 +33,7 @@ s2
 
 ## smoothing
 s3 = transformIntensity(s2, movingAverage, halfWindowSize=2)
+s3
 
 ## or alternatively you could define your own function:
 #simpleSmooth = function(y) {
@@ -39,11 +41,11 @@ s3 = transformIntensity(s2, movingAverage, halfWindowSize=2)
 #}
 #
 #s3 = transformIntensity(s2, simpleSmooth)
-
-s3
-length(s2) # 22431
-length(s3) # 22427 - at both ends data points have been removed
-
+## please note that this simple implementation produces 2 NA at the beginning
+## and the end of the mass spectrum (default transformIntensity removes NA
+## values)
+#length(s2) # 22431
+#length(s3) # 22427 - at both ends data points have been removed
 
 ## baseline subtraction
 
