@@ -12,7 +12,7 @@ library("MALDIquant")
 library("MALDIquantForeign")
 
 ## import mzXML data
-spectra <- import(file.path("data", "LONGROOTS.tar.bz2"))
+spectra <- import("http://files.figshare.com/1106533/Example.zip")
 
 ## averaging individual scans into a mean spectrum per file
 files <- sapply(spectra, function(x)metaData(x)$file)
