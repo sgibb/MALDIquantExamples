@@ -16,7 +16,7 @@ spectra <- import("http://files.figshare.com/1106533/Example.zip")
 
 ## averaging individual scans into a mean spectrum per file
 files <- sapply(spectra, function(x)metaData(x)$file)
-meanSpectra <- mergeMassSpectra(spectra, files)
+meanSpectra <- averageMassSpectra(spectra, files)
 
 ## peak detection
 peaks <- detectPeaks(meanSpectra, halfWindowSize=4, SNR=0)

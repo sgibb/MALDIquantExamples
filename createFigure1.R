@@ -27,16 +27,16 @@ data("fiedler2009subset", package="MALDIquant")
 ## some preprocessing
 
 ## sqrt transform (for variance stabilization)
-tSpectra <- transformIntensity(fiedler2009subset, sqrt)
+tSpectra <- transformIntensity(fiedler2009subset, method="sqrt")
 
 ## simple 5 point moving average for smoothing spectra
-tSpectra <- transformIntensity(tSpectra, movingAverage, halfWindowSize=2)
+tSpectra <- smoothIntensity(tSpectra, method="MovingAverage", halfWindowSize=2)
 
 ## remove baseline
 rbSpectra <- removeBaseline(tSpectra)
 
 ## calibrate intensity values by "total ion current"
-cbSpectra <- standardizeTotalIonCurrent(rbSpectra)
+cbSpectra <- calibrateIntensity(rbSpectra, method="TIC")
 
 ## run peak detection
 peaks <- detectPeaks(cbSpectra, SNR=5)
@@ -51,7 +51,7 @@ warpedSpectra <- warpMassSpectra(cbSpectra, warpingFunctions)
 warpedPeaks <- warpMassPeaks(peaks, warpingFunctions)
 
 ## merge technical replicates
-mergedSpectra <- mergeMassSpectra(warpedSpectra, rep(1:8, each=2))
+mergedSpectra <- averageMassSpectra(warpedSpectra, rep(1:8, each=2))
 
 binnedPeaks <- binPeaks(warpedPeaks)
 mergedPeaks <- mergeMassPeaks(binnedPeaks, rep(1:8, each=2))
@@ -104,7 +104,7 @@ par(yaxt="n")
 DE <- c(2, 10, 14, 16)
 ## limits for plot D/E
 xlimDE <- c(4180, 4240)
-ylimDE <- c(0, 4e-4)
+ylimDE <- c(0, 1.9e-3)
 ## line types
 lty <- c(1, 4, 2, 6)
 

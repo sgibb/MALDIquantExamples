@@ -20,10 +20,10 @@ data("fiedler2009subset", package="MALDIquant")
 ##############################################################################
 
 ## sqrt transform (for variance stabilization)
-spectra <- transformIntensity(fiedler2009subset, sqrt)
+spectra <- transformIntensity(fiedler2009subset, method="sqrt")
 
 ## simple 5 point moving average for smoothing spectra
-spectra <- transformIntensity(spectra, movingAverage, halfWindowSize=2)
+spectra <- smoothIntensity(spectra, method="MovingAverage", halfWindowSize=2)
 
 ## remove baseline
 spectra <- removeBaseline(spectra)

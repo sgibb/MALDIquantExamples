@@ -21,7 +21,7 @@ if (packageVersion("MALDIquantForeign") < "0.4") {
 ## define plot function
 plotImage <- function(x, range, main) {
   ## display only mass in range
-  x <- trim(x, range[1], range[2])
+  x <- trim(x, range=range)
 
   ## find x and y positions
   pos <- lapply(x, function(y)metaData(y)$imaging$pos)

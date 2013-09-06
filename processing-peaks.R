@@ -28,24 +28,12 @@ length(s)    # show number of m/z and intensity values
 #### PREPROCESSING ####
 
 ## sqrt transform (for variance stabilization)
-s2 = transformIntensity(s, fun=sqrt)
+s2 = transformIntensity(s, method="sqrt")
 s2
 
 ## smoothing
-s3 = transformIntensity(s2, movingAverage, halfWindowSize=2)
+s3 = smoothIntensity(s2, method="MovingAverage", halfWindowSize=2)
 s3
-
-## or alternatively you could define your own function:
-#simpleSmooth = function(y) {
-#  return ( filter(y, rep(1, 5)/5, sides=2) ) # 5 point moving average
-#}
-#
-#s3 = transformIntensity(s2, simpleSmooth)
-## please note that this simple implementation produces 2 NA at the beginning
-## and the end of the mass spectrum (default transformIntensity removes NA
-## values)
-#length(s2) # 22431
-#length(s3) # 22427 - at both ends data points have been removed
 
 ## baseline subtraction
 
