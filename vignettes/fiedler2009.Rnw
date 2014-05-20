@@ -1,0 +1,354 @@
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Analysis of Fiedler et al. 2009}
+%\VignetteKeywords{Bioinformatics, Proteomics, Mass Spectrometry}
+%\VignettePackage{fiedler2009}
+
+\documentclass[12pt]{article}
+
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{bibentry}       % inline bibentries
+\nobibliography*            % no special bibliography for bibentry
+
+\input{utils}
+
+\title{Analysis of Fiedler et al. 2009 using \Mq{} }
+
+\author{
+  Sebastian Gibb%
+  \thanks{\email{mail@sebastiangibb.de}}
+}
+\date{\today}
+
+\begin{document}
+
+<<knitrsetup, include=FALSE, cache=FALSE>>=
+library("knitr")
+opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
+               fig.path=file.path("figures", "fiedler2009/"),
+               fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
+@
+
+\maketitle
+
+\begin{abstract}
+  This vignette describes the analysis of the MALDI-TOF spectra described in
+  \citet{Fiedler2009} using \Mq{}\\
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+
+\input{foreword}
+
+\section{Dataset}
+
+In this vignette we use the dataset described in \citet{Fiedler2009}. Please
+contact the authors directly if you want to use the dataset in your own
+analysis.
+
+This dataset contains 480 MALDI-TOF mass spectra from blood sera of 60 patients
+and 60 healthy controls (each sample has four technical replicates).
+
+It is divided in three set:
+\begin{enumerate}
+  \item \emph{Discovery Set A}: 20 patients with pancreatic cancer and 20
+    healthy patients from the University Hospital Leipzig.
+  \item \emph{Discovery Set B}: 20 patients with pancreatic cancer and 20
+    healthy patients from the University Hospital Heidelberg.
+  \item \emph{Discovery Set C}: 20 patients with pancreatic cancer and 20
+    healthy patients from the University Hospital Leipzig (half resolution).
+\end{enumerate}
+
+Both discovery sets \emph{A} and \emph{B} were measured on the same target
+(batch). The validation set \emph{C} was measured a few months later.
+
+Please see \citet{Fiedler2009} for details.
+
+\section{Analysis}
+
+\subsection{Setup}
+
+First we need to install the necessary packages (you can skip this part if
+you have already done this). You can install \Mq{} \citep{MALDIquant},
+\MqF{} \citep{MALDIquantForeign}, \Rpackage{sda}
+\citep{sda} and \Rpackage{crossval} \citep{crossval} directly from \CRAN{}.
+To install this data package from
+\url{http://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{devtools} \citep{devtools} package.
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages(c("MALDIquant", "MALDIquantForeign",
+                   "sda", "crossval", "devtools"))
+library("devtools")
+install_github("sgibb/MALDIquantExamples")
+@
+
+Next we load the packages.
+<<loadpackages, echo=FALSE>>=
+suppressPackageStartupMessages(library("MALDIquant"))
+suppressPackageStartupMessages(library("MALDIquantForeign"))
+suppressPackageStartupMessages(library("sda"))
+suppressPackageStartupMessages(library("crossval"))
+suppressPackageStartupMessages(library("xtable"))
+@
+<<packages>>=
+library("MALDIquant")
+library("MALDIquantForeign")
+library("sda")
+library("crossval")
+
+library("MALDIquantExamples")
+@
+
+\subsection{Import Raw Data}
+
+We use the \Rfunction{getPathFiedler2009} function to get
+the correct file path to the spectra and the metadata file respectively.
+<<import>>=
+## import the spectra
+spectra <- import(getPathFiedler2009()["spectra"],
+                  verbose=FALSE)
+
+## import metadata
+spectra.info <- read.table(getPathFiedler2009()["info"],
+                           sep=",", header=TRUE)
+@
+
+Because of heavy batch effects between the two hospitals we consider only the
+data collected in the University Hospital Heidelberg.
+
+<<reduce>>=
+isHeidelberg <- spectra.info$location == "heidelberg"
+
+spectra <- spectra[isHeidelberg]
+spectra.info <- spectra.info[isHeidelberg,]
+@
+
+We do a basic quality control and test whether all spectra contain the same
+number of data points and are not empty.
+
+\subsection{Quality Control}
+
+<<qc>>=
+table(sapply(spectra, length))
+any(sapply(spectra, isEmpty))
+all(sapply(spectra, isRegular))
+@
+
+Subsequently we ensure that all spectra have the same mass range.
+<<trim>>=
+spectra <- trim(spectra)
+@
+
+Finally we draw some plots and inspect the spectra visually.
+
+<<plotseed, echo=FALSE>>=
+set.seed(123)
+@
+<<plot>>=
+idx <- sample(length(spectra), size=2)
+plot(spectra[[idx[1]]])
+plot(spectra[[idx[2]]])
+@
+
+\subsection{Transformation and Smoothing}
+
+We apply the square root transformation to simplify graphical visualization
+and to overcome the potential dependency of the variance from the mean.
+
+<<vs>>=
+spectra <- transformIntensity(spectra, method="sqrt")
+@
+
+In the next step we use a 21 point \emph{Savitzky-Golay}-Filter
+\citep{Savitzky1964} to smooth the spectra.
+<<sm>>=
+spectra <- smoothIntensity(spectra, method="SavitzkyGolay",
+                           halfWindowSize=10)
+@
+
+\subsection{Baseline Correction}
+
+Matrix effects and chemical noise results in some background noise. That's why
+we have to apply a baseline correction. In this example we use the
+\emph{SNIP} algorithm \citep{Ryan1988} to correct the baseline.
+
+<<be>>=
+baseline <- estimateBaseline(spectra[[1]], method="SNIP",
+                             iterations=150)
+plot(spectra[[1]])
+lines(baseline, col="red", lwd=2)
+@
+
+<<bc>>=
+spectra <- removeBaseline(spectra, method="SNIP",
+                          iterations=150)
+plot(spectra[[1]])
+@
+
+\subsection{Intensity Calibration}
+
+We perform the \emph{Total-Ion-Current}-calibration (TIC; often called
+normalization) to equalize the intensities across spectra.
+
+<<cb>>=
+spectra <- calibrateIntensity(spectra, method="TIC")
+@
+
+\subsection{Alignment}
+
+Next we need to (re)calibrate the mass values. Our alignment procedure is a peak
+based warping algorithm. \Mq{} offers \Rfunction{alignSpectra} as a wrapper
+around more complicated functions. If you need a finer control or want to
+investigate the impact of different parameters please use
+\Rfunction{determineWarpingFunctions} instead (see
+\Rfunction{?determineWarpingFunctions} for details).
+
+<<pa>>=
+spectra <- alignSpectra(spectra)
+@
+
+We average the technical replicates before we look for peaks and adjust
+our metadata table accordingly.
+
+<<avg>>=
+avgSpectra <-
+  averageMassSpectra(spectra, labels=spectra.info$patientID)
+avgSpectra.info <-
+  spectra.info[!duplicated(spectra.info$patientID), ]
+@
+
+\subsection{Peak Detection}
+
+The peak detection is the crucial feature reduction step. Before performing the
+peak detection we estimate the noise of some spectra to get a feeling for the
+\emph{signal-to-noise ratio} (SNR).
+<<noise>>=
+noise <- estimateNoise(avgSpectra[[1]])
+plot(avgSpectra[[1]], xlim=c(4000, 5000), ylim=c(0, 0.002))
+lines(noise, col="red")                     # SNR == 1
+lines(noise[, 1], 2*noise[, 2], col="blue") # SNR == 2
+@
+
+In this case we decide to set a \emph{SNR} of 2 (blue line).
+
+<<pd>>=
+peaks <- detectPeaks(avgSpectra, SNR=2, halfWindowSize=20)
+@
+
+<<pdp>>=
+plot(avgSpectra[[1]], xlim=c(4000, 5000), ylim=c(0, 0.002))
+points(peaks[[1]], col="red", pch=4)
+@
+
+\subsection{Post Processing}
+
+After the alignment the peak positions (mass) are very similar but not
+identical. The binning is needed to make similar peak mass values identical.
+
+<<pb>>=
+peaks <- binPeaks(peaks)
+@
+
+We choose a very low signal-to-noise ratio to keep as much features as possible.
+To remove some false positive peaks we remove peaks that appear in less than 50
+\% of all spectra in each group.
+
+<<pf>>=
+peaks <- filterPeaks(peaks, minFrequency=c(0.5, 0.5),
+                     labels=avgSpectra.info$health,
+                     mergeWhitelists=TRUE)
+@
+
+Finally we create the feature matrix and label the rows with the corresponding
+patient ID.
+
+<<fm>>=
+featureMatrix <- intensityMatrix(peaks, avgSpectra)
+rownames(featureMatrix) <- avgSpectra.info$patientID
+@
+
+\subsection{Diagonal Discriminant Analysis}
+
+We finish the \Mq{} preprocessing and use the
+\emph{diagonal discriminant analysis} (DDA)
+function of \Rpackage{sda} \citep{sda} to find the most important peaks.
+
+<<dda>>=
+Xtrain <- featureMatrix
+Ytrain <- avgSpectra.info$health
+ddar <- sda.ranking(Xtrain=featureMatrix, L=Ytrain, fdr=FALSE,
+                    diagonal=TRUE)
+@
+<<ddaresults, echo=FALSE, results="asis">>=
+xtable(ddar[1:10, ], booktabs=TRUE)
+@
+
+\subsection{Hierarchical Clustering}
+
+To visualize the results without any feature selection by \emph{DDA} we apply a
+hierarchical cluster analysis based on the euclidean distance.
+
+<<hclust>>=
+distanceMatrix <- dist(featureMatrix, method="euclidean")
+
+hClust <- hclust(distanceMatrix, method="complete")
+
+plot(hClust, hang=-1)
+@
+
+Next we use only the 2 top peaks selected in the \emph{DDA} and we get a
+nearly perfect split between the cancer and control group.
+
+<<hclustfs>>=
+top <- ddar[1:2, "idx"]
+
+distanceMatrixTop <- dist(featureMatrix[, top],
+                          method="euclidean")
+
+hClustTop <- hclust(distanceMatrixTop, method="complete")
+
+plot(hClustTop, hang=-1)
+@
+
+\subsection{Cross Validation}
+
+Subsequently we use the \Rpackage{crossval} \citep{crossval} package to perform
+a 10-fold cross validation of these two selected peaks.
+
+<<cv>>=
+# create a prediction function for the cross validation
+predfun.dda <- function(Xtrain, Ytrain, Xtest, Ytest,
+                        negative) {
+  dda.fit <- sda(Xtrain, Ytrain, diagonal=TRUE, verbose=FALSE)
+  ynew <- predict(dda.fit, Xtest, verbose=FALSE)$class
+  return(confusionMatrix(Ytest, ynew, negative=negative))
+}
+
+# set seed to get reproducible results
+set.seed(1234)
+
+cv.out <- crossval(predfun.dda,
+                   X=featureMatrix[, top],
+                   Y=avgSpectra.info$health,
+                   K=10, B=20,
+                   negative="control",
+                   verbose=FALSE)
+diagnosticErrors(cv.out$stat)
+@
+
+\subsection{Summary}
+
+We found the peaks \textit{m/z} 8937 and 4467 as important features for the
+discrimination between the cancer and control group.
+
+\section{Session Information}
+<<sessioninfo, echo=FALSE, results="asis">>=
+toLatex(sessionInfo(), locale=FALSE)
+@
+
+\bibliographystyle{apalike}
+\bibliography{fiedler2009,r}
+
+\end{document}

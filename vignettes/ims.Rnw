@@ -1,0 +1,112 @@
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Imaging Mass Spectrometry Example}
+%\VignetteKeywords{Bioinformatics, Proteomics, Mass Spectrometry}
+%\VignettePackage{ims}
+
+\documentclass[12pt]{article}
+
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{bibentry}       % inline bibentries
+\nobibliography*            % no special bibliography for bibentry
+
+\input{utils}
+
+\title{Imaging Mass Spectrometry using \Mq{} }
+
+\author{
+  Sebastian Gibb%
+  \thanks{\email{mail@sebastiangibb.de}}
+}
+\date{\today}
+
+\begin{document}
+
+<<knitrsetup, include=FALSE, cache=FALSE>>=
+library("knitr")
+opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
+               fig.path=file.path("figures", "ims/"),
+               fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
+@
+
+\maketitle
+
+\begin{abstract}
+  This vignette describes how to load Imaging Mass Spectrometry Data and plot
+  them using using \Mq{}\\
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+
+\input{foreword}
+
+\section{Dataset}
+
+In this vignette we use the \emph{imzML} example dataset of an urinary bladder
+from
+\url{http://www.maldi-msi.org/index.php?option=com_content&view=article&id=186&Itemid=68}.
+
+\section{Plotting}
+
+\subsection{Setup}
+
+First we need to install the necessary packages (you can skip this part if
+you have already done this). You can install \Mq{} \citep{MALDIquant},
+\Rpackage{MALDIquantForeign} \citep{MALDIquantForeign}
+directly from \CRAN{}.
+To install this example package from
+\url{http://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{devtools} \citep{devtools} package.
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages(c("MALDIquant", "MALDIquantForeign", "devtools"))
+library("devtools")
+install_github("sgibb/MALDIquantExamples")
+@
+
+Next we load the packages.
+<<loadpackages, echo=FALSE>>=
+suppressPackageStartupMessages(library("MALDIquant"))
+suppressPackageStartupMessages(library("MALDIquantForeign"))
+@
+<<packages>>=
+library("MALDIquant")
+library("MALDIquantForeign")
+
+library("MALDIquantExamples")
+@
+
+\subsection{Import Raw Data}
+
+We use the \Rfunction{importImzMl} function provided by \MqF to import the
+\emph{imzML} file from
+\url{http://www.maldi-msi.org/download/imzml/s043_processed.zip}.
+
+<<import>>=
+spectra <- import("http://www.maldi-msi.org/download/imzml/s043_processed.zip",
+                  verbose=FALSE)
+@
+
+\subsection{Plot Image}
+
+We use the same mass range as in \emph{Example 2} on
+\url{http://www.maldi-msi.org/index.php?option=com_content&view=article&id=186&Itemid=68}
+
+<<plotimage>>=
+plotImsSlice(spectra, range=c(156.95, 157.45), main="urinary bladder")
+@
+
+\subsection{IMS Shiny Example}
+
+Please have a look at \url{https://github.com/sgibb/ims-shiny/}.
+
+\section{Session Information}
+<<sessioninfo, echo=FALSE, results="asis">>=
+toLatex(sessionInfo(), locale=FALSE)
+@
+
+\bibliographystyle{apalike}
+\bibliography{r}
+
+\end{document}
