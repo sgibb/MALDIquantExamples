@@ -23,7 +23,7 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 - [Preprocessing and peak detection example - single spectrum.](https://github.com/sgibb/MALDIquant/blob/master/demo/peaks.R)
 
 - Analysis of [Fiedler et al. 2009](http://dx.doi.org/10.1158/1078-0432.CCR-08-2701) using MALDIquant
-    [vignette](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/fiedler2009.pdf),
+    [vignette](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/fiedler2009.pdf?raw=true),
     [R code](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/fiedler2009.R)
 
 
@@ -36,7 +36,7 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 ### Imaging Mass Spectrometry (IMS) examples
 
-- [Import of imzML data and image display.](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/ims.pdf)
+- [Import of imzML data and image display.](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/ims.pdf?raw=true)
 
 - [MALDIquant IMS + shiny example.](https://github.com/sgibb/ims-shiny)
 
