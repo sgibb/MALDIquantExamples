@@ -27,8 +27,8 @@ Please visit: http://strimmerlab.org/software/maldiquant/
     [R code](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/fiedler2009.R)
 
 
-- [R code to reproduce figure 1 used in Gibb and Strimmer 2012.](https://github.com/sgibb/MALDIquantExamples/blob/master/R/createFigure1.R)
-    [colorized version] (https://github.com/sgibb/MALDIquantExamples/blob/master/R/createFigure1_color.R)
+- [R code to reproduce figure 1 used in Gibb and Strimmer 2012](https://github.com/sgibb/MALDIquantExamples/blob/master/R/createFigure1.R)
+    ([colorized version] (https://github.com/sgibb/MALDIquantExamples/blob/master/R/createFigure1_color.R)).
 
 ### MALDIquantForeign examples
 
