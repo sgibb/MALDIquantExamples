@@ -344,6 +344,6 @@ toLatex(sessionInfo(), locale=FALSE)
 @
 
 \bibliographystyle{apalike}
-\bibliography{fiedler2009,r}
+\bibliography{bibliography}
 
 \end{document}
