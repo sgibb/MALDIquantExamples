@@ -5,11 +5,6 @@
 
 \documentclass[12pt]{article}
 
-\usepackage{natbib}
-\usepackage{hyperref}
-\usepackage{bibentry}       % inline bibentries
-\nobibliography*            % no special bibliography for bibentry
-
 \input{utils}
 
 \title{Imaging Mass Spectrometry using \Mq{} }
