@@ -26,6 +26,9 @@ Please visit: http://strimmerlab.org/software/maldiquant/
     [vignette](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/fiedler2009.pdf?raw=true),
     [R code](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/fiedler2009.R)
 
+- Bacterial Species Determination using MALDIquant
+    [vignette](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/species.pdf?raw=true),
+    [R code](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/species.R)
 
 - [R code to reproduce figure 1 used in Gibb and Strimmer 2012](https://github.com/sgibb/MALDIquantExamples/blob/master/R/createFigure1.R)
     ([colorized version] (https://github.com/sgibb/MALDIquantExamples/blob/master/R/createFigure1_color.R)).
