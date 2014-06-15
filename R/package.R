@@ -31,6 +31,6 @@
 #' @keywords package
 #' @rdname MALDIquantExamples-package
 #'
-#' @import MALDIquant MALDIquantForeign sda crossval
+#' @import MALDIquant MALDIquantForeign sda crossval pvclust
 #'
 NULL

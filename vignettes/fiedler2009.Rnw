@@ -81,10 +81,7 @@ install_github("sgibb/MALDIquantExamples")
 
 Next we load the packages.
 <<loadpackages, echo=FALSE>>=
-suppressPackageStartupMessages(library("MALDIquant"))
-suppressPackageStartupMessages(library("MALDIquantForeign"))
-suppressPackageStartupMessages(library("sda"))
-suppressPackageStartupMessages(library("crossval"))
+suppressPackageStartupMessages(library("MALDIquantExamples"))
 suppressPackageStartupMessages(library("xtable"))
 @
 <<packages>>=

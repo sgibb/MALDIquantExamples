@@ -1,0 +1,488 @@
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Species Identification using MALDIquant}
+%\VignetteKeywords{Bioinformatics, Proteomics, Mass Spectrometry}
+%\VignettePackage{species}
+
+\documentclass[12pt]{article}
+
+\input{utils}
+
+\title{Species Identification using \Mq{} }
+
+\author{
+  Sebastian Gibb%
+  \thanks{\email{mail@sebastiangibb.de}}
+}
+
+\author{Korbinian Strimmer%
+  \thanks{\email{k.strimmer@imperial.ac.uk}}
+}
+
+\date{\today}
+
+\begin{document}
+
+<<knitrsetup, include=FALSE, cache=FALSE>>=
+library("knitr")
+opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
+               fig.path=file.path("figures", "bacteria/"),
+               fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
+@
+
+\maketitle
+
+\begin{abstract}
+  This vignette describes how to use \Mq{} for species identification.
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+
+\input{foreword}
+
+\section{Dataset}
+
+The dataset we use in this vignette was kindly provided by
+Dr. Bryan R. Thoma (\email{bryanthoma@yahoo.com}).
+It contains spectra of four different bacteria species.
+Each species is represented by eight individual samples and each sample has
+three technical replicates.
+
+\section{Analysis}
+
+\subsection{Setup}
+
+First we need to install the necessary packages (you can skip this part if
+you have already done this). You can install \Mq{} \citep{MALDIquant},
+\MqF{} \citep{MALDIquantForeign}, \Rpackage{pvclust} \citep{pvclust},
+\Rpackage{sda} \citep{sda} and \Rpackage{crossval} \citep{crossval}
+directly from \CRAN{}.
+To install this data package from
+\url{http://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{devtools} \citep{devtools} package.
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages(c("MALDIquant", "MALDIquantForeign", "pvclust",
+                   "sda", "crossval", "pvclust", "devtools"))
+library("devtools")
+install_github("sgibb/MALDIquantExamples")
+@
+
+Next we load the packages.
+<<loadpackages, echo=FALSE>>=
+suppressPackageStartupMessages(library("MALDIquant"))
+suppressPackageStartupMessages(library("MALDIquantForeign"))
+suppressPackageStartupMessages(library("pvclust"))
+suppressPackageStartupMessages(library("sda"))
+suppressPackageStartupMessages(library("crossval"))
+suppressPackageStartupMessages(library("xtable"))
+@
+<<packages>>=
+library("MALDIquant")
+library("MALDIquantForeign")
+library("pvclust")
+library("sda")
+library("crossval")
+
+library("MALDIquantExamples")
+@
+
+\subsection{Import Raw Data}
+
+We use the \Rfunction{getPathSpecies} function to get
+the correct local file path to the spectra.
+<<import>>=
+spectra <- import(getPathSpecies(), verbose=FALSE)
+@
+
+We do a basic quality control and test whether all spectra contain the same
+number of data points and are not empty.
+
+\subsection{Quality Control}
+
+<<qc>>=
+table(sapply(spectra, length))
+any(sapply(spectra, isEmpty))
+all(sapply(spectra, isRegular))
+@
+
+Subsequently we ensure that all spectra have the same mass range.
+<<trim>>=
+spectra <- trim(spectra)
+@
+
+Finally we draw some plots and inspect the spectra visually.
+
+<<plotseed, echo=FALSE>>=
+set.seed(123)
+@
+<<plot>>=
+idx <- sample(length(spectra), size=2)
+plot(spectra[[idx[1]]])
+plot(spectra[[idx[2]]])
+@
+
+\subsection{Transformation and Smoothing}
+\label{subsec:sm}
+
+We apply the square root transformation to simplify graphical visualization
+and to overcome the potential dependency of the variance from the mean.
+
+<<vs>>=
+spectra <- transformIntensity(spectra, method="sqrt")
+@
+
+In the next step we want to smooth our spectra with the
+\emph{Savitzky-Golay}-Filter \citep{Savitzky1964}. According to
+\citet{Bromba1981} the best \Rcode{halfWindowSize} should be smaller than the
+\emph{FWHM} (full width at half maximum) of the peaks.
+We add the argument \Rcode{type="b"} to the \Rfunction{plot} command to show both
+lines and data points in our plots. We count the data points in a few different
+regions of some spectra to estimate the average \emph{FWHM} (of course this is
+not the most sophisticated method). In the figure below we consider all points
+above the dashed blue line and get a \emph{FWHM} around 10-12 data points. We
+choose \Rcode{halfWindowSize=10}.
+<<fwhm>>=
+plot(spectra[[1]], type="b",
+     xlim=c(2235.3, 2252.0), ylim=c(45, 100))
+abline(h=72, col=4, lty=2)
+plot(spectra[[1]], type="b",
+     xlim=c(11220, 11250), ylim=c(24, 40))
+abline(h=32, col=4, lty=2)
+@
+
+Afterwards we apply a 21 (\Rcode{2*halfWindowSize+1}) point
+\emph{Savitzky-Golay}-Filter \citep{Savitzky1964} to smooth the spectra.
+<<sm>>=
+spectra <- smoothIntensity(spectra, method="SavitzkyGolay",
+                           halfWindowSize=10)
+@
+
+\subsection{Baseline Correction}
+\label{subsec:bc}
+
+Matrix effects and chemical noise results in some background noise. That's why
+we have to apply a baseline correction. In this example we use the
+\emph{SNIP} algorithm \citep{Ryan1988} to correct the baseline.
+
+Similar to the problem of the \Rcode{halfWindowSize} in section \ref{subsec:sm}
+we need to choose a \Rcode{halfWindowSize} respectively number of
+\Rcode{iterations} for the baseline correction algorithm as well. The baseline
+should be flexible enough to follow trends but must not reduce the high of the
+peaks. We simply try a few different numbers of \Rcode{iterations}.
+<<be>>=
+## define iteration steps: 25, 50, ..., 100
+iterations <- seq(from=25, to=100, by=25)
+## define different colors for each step
+col <- rainbow(length(iterations))
+
+plot(spectra[[1]], xlim=c(2000, 12000))
+
+## draw different baseline estimates
+for (i in seq(along=iterations)) {
+  baseline <- estimateBaseline(spectra[[1]], method="SNIP",
+                               iterations=iterations[i])
+  lines(baseline, col=col[i], lwd=2)
+}
+
+legend("topright", legend=iterations, col=col, lwd=1)
+@
+
+25 \Rcode{iterations} are already very flexible but 50 is not flexible enough
+and the height of the peaks is not reduced very much.
+So we choose \Rcode{iterations=25} for the baseline removal.
+
+<<bc>>=
+spectra <- removeBaseline(spectra, method="SNIP",
+                          iterations=25)
+plot(spectra[[1]])
+@
+
+\subsection{Intensity Calibration}
+
+We perform the \emph{Total-Ion-Current}-calibration (TIC; often called
+normalization) to equalize the intensities across spectra.
+
+<<cb>>=
+spectra <- calibrateIntensity(spectra, method="TIC")
+@
+
+\subsection{Alignment}
+\label{subsec:pa}
+
+Next we need to (re)calibrate the mass values. Our alignment procedure is a peak
+based warping algorithm. \Mq{} offers \Rfunction{alignSpectra} as a wrapper
+around more complicated functions. If you need a finer control or want to
+investigate the impact of different parameters please use
+\Rfunction{determineWarpingFunctions} instead (see
+\Rfunction{?determineWarpingFunctions} for details).
+
+<<pa>>=
+spectra <- alignSpectra(spectra)
+@
+
+We want to average the technical replicates before we are looking for peaks. Our
+spectra are recorded thrice for each spot. That's why we average each spot. We
+get the spot information using the \Rfunction{metaData} method.
+
+<<metadata>>=
+metaData(spectra[[1]])$spot
+@
+
+We collect all spots with a \Rfunction{sapply} call (to loop over all spectra)
+and use this information to create our average spectra. Because some species are
+measured in different runs on the same spot location we also add the species
+name to average only corresponding spectra.
+
+<<spots>>=
+spots <- sapply(spectra, function(x)metaData(x)$spot)
+species <- sapply(spectra, function(x)metaData(x)$sampleName)
+head(spots)
+head(species)
+@
+
+<<average>>=
+avgSpectra <-
+  averageMassSpectra(spectra, labels=paste0(species, spots))
+@
+
+\subsection{Peak Detection}
+
+The peak detection is the crucial feature reduction step. Before performing the
+peak detection we need to estimate the noise of some spectra to get a feeling
+for the \emph{signal-to-noise ratio} (SNR). We use a similar approach as in
+section \ref{subsec:bc}.
+<<noise>>=
+## define snrs steps: 1, 1.5, ... 2.5
+snrs <- seq(from=1, to=2.5, by=0.5)
+## define different colors for each step
+col <- rainbow(length(snrs))
+
+## estimate noise
+noise <- estimateNoise(avgSpectra[[1]],
+                       method="SuperSmoother")
+
+plot(avgSpectra[[1]],
+     xlim=c(6000, 16000), ylim=c(0, 0.0016))
+
+for (i in seq(along=snrs)) {
+  lines(noise[, "mass"],
+        noise[, "intensity"]*snrs[i],
+        col=col[i], lwd=2)
+}
+legend("topright", legend=snrs, col=col, lwd=1)
+@
+
+2 or 2.5 look like a good compromise between sensitivity and specificity. We
+prefer a higher sensitivity and choose a \emph{SNR} of 2 (blue line) for the
+peak detection. For the \Rcode{halfWindowSize} we use a similar value as
+determined in section \ref{subsec:sm}.
+
+<<pd>>=
+peaks <- detectPeaks(avgSpectra, SNR=2, halfWindowSize=10)
+@
+
+<<pdp>>=
+plot(avgSpectra[[1]], xlim=c(6000, 16000), ylim=c(0, 0.0016))
+points(peaks[[1]], col="red", pch=4)
+@
+
+\subsection{Post Processing}
+
+After the alignment the peak positions (mass) are very similar but not
+identical. The binning is needed to make similar peak mass values identical.
+
+<<pb>>=
+peaks <- binPeaks(peaks)
+@
+
+We chose a very low signal-to-noise ratio to keep as much features as possible.
+To remove some false positive peaks we remove peaks that appear in less than
+25~\% (because we have four groups) of all spectra.
+
+<<pf>>=
+peaks <- filterPeaks(peaks, minFrequency=0.25)
+@
+
+Finally we create the feature matrix and label the rows with the corresponding
+species and spot name. We need to recollect both information because we reduce
+the number of spectra in the average step (see section \ref{subsec:pa}).
+
+<<spots2>>=
+spots <- sapply(avgSpectra, function(x)metaData(x)$spot)
+species <- sapply(avgSpectra, function(x)metaData(x)$sampleName)
+species <- factor(species) # convert to factor
+                           # (needed later in crossval)
+@
+
+<<fm>>=
+featureMatrix <- intensityMatrix(peaks, avgSpectra)
+rownames(featureMatrix) <- paste(species, spots, sep=".")
+@
+
+\subsection{Clustering}
+
+Now we use the \Rpackage{pvclust} package \citep{pvclust} to apply a
+hierarchical clustering analysis with bootstrapping.
+
+<<clust, eval=FALSE, fig.height=5>>=
+pv <- pvclust(t(featureMatrix),
+              method.hclust="ward",
+              method.dist="euclidean")
+plot(pv, print.num=FALSE)
+@
+<<clusthidden, echo=FALSE, fig.height=5>>=
+## suppress messages "ward is renamed into ward.D"; BTW we want to use ward.D2.
+## I asked the authors of pvclust to allow ward.D2.
+pv <- suppressMessages(pvclust(t(featureMatrix),
+                       method.hclust="ward",
+                       method.dist="euclidean"))
+plot(pv, print.num=FALSE)
+@
+
+\subsection{Diagonal Discriminant Analysis}
+
+We finish our analysis using the \emph{diagonal discriminant analysis} (DDA)
+function of \Rpackage{sda} \citep{sda} to find the peaks that are typical
+for a specific species.
+
+<<dda, fig.height=7.5>>=
+ddar <- sda.ranking(Xtrain=featureMatrix, L=species,
+                    fdr=FALSE, diagonal=TRUE)
+plot(ddar)
+@
+
+In the plot above we could see that the peak \textit{m/z} 9509 seems to be
+typical for \emph{species2}, \textit{m/z} 6343 for \emph{species4} and so on.
+
+\subsection{Linear Discriminant Analysis}
+
+We try the \emph{linear discriminant analysis} (LDA), too
+(it is part of \Rpackage{sda} \citep{sda} as well).
+
+<<lda, fig.height=7.5>>=
+ldar <- sda.ranking(Xtrain=featureMatrix, L=species,
+                    fdr=FALSE, diagonal=FALSE)
+plot(ldar)
+@
+
+\subsection{Variable Selection using Cross-Validation}
+
+In this section we want to apply cross-validation to find out, how many peaks
+and which ones we need to discriminate between the species.
+
+We use the package \Rpackage{crossval} \citep{crossval}. This package provides
+the \Rfunction{crossval} function which needs a specific prediction function.
+The prediction function combines the model creation, the prediction
+and the comparison between the true and the predicted results.
+
+<<predictfuncv>>=
+predfun <- function(Xtrain, Ytrain, Xtest, Ytest,
+                    numVars, diagonal=FALSE) {
+  # estimate ranking and determine the best numVars variables
+  ra <- sda.ranking(Xtrain, Ytrain,
+                    verbose=FALSE, diagonal=diagonal, fdr=FALSE)
+  selVars <- ra[,"idx"][1:numVars]
+
+  # fit and predict
+  sda.out <- sda(Xtrain[, selVars, drop=FALSE], Ytrain,
+                 diagonal=diagonal, verbose=FALSE)
+  ynew <- predict(sda.out, Xtest[, selVars, drop=FALSE],
+                  verbose=FALSE)$class
+
+  # compute accuracy
+  acc <- mean(Ytest == ynew)
+
+  return(acc)
+}
+@
+
+We want to repeat the cross-validation 20 times and use 5 folds.
+
+<<cvsetup>>=
+K <- 5  # number of folds
+B <- 20 # number of repetitions
+@
+
+To test our cross-validation setup we want to determine the performance of DDA
+using the top 10 features (peaks) ranked by $t$ scores.
+
+<<cvtop10>>=
+set.seed(12345)
+cv.dda10 <- crossval(predfun,
+                     X=featureMatrix, Y=species,
+                     K=K, B=B,
+                     numVars=10, diagonal=FALSE,
+                     verbose=FALSE)
+cv.dda10$stat
+@
+
+In the next step we look for the optimal number of peaks (which is more
+interesting than calculating the performance for the top 10 features).
+
+We calculate the performance of the top 1-15 (and all features) in a similar way
+as the top 10 features in the example above.
+
+<<cvoptimaldd>>=
+npeaks <- c(1:15, ncol(featureMatrix))  # number of peaks
+@
+
+First we use DDA.
+
+<<cvoptimaldda>>=
+# estimate accuracy for DDA
+set.seed(12345)
+cvsim.dda <- sapply(npeaks, function(i) {
+  cv <- crossval(predfun,
+                 X=featureMatrix, Y=species,
+                 K=K, B=B, numVars=i, diagonal=TRUE,
+                 verbose=FALSE)
+  return(cv$stat)
+})
+@
+
+The same using LDA (the only difference is \Rcode{diagonal=FALSE}).
+
+<<cvoptimallda>>=
+# estimate accuracy for LDA
+set.seed(12345)
+cvsim.lda <- sapply(npeaks, function(i) {
+  cv <- crossval(predfun,
+                 X=featureMatrix, Y=species,
+                 K=K, B=B, numVars=i, diagonal=FALSE,
+                 verbose=FALSE)
+  return(cv$stat)
+})
+@
+
+We combine the results and put them into a table.
+
+<<cvoptimaltable>>=
+result.sim <- cbind(nPeaks=npeaks,
+                    "DDA-ACC"=cvsim.dda,
+                    "LDA-ACC"=cvsim.lda)
+@
+<<cvoptimaltablelatex, echo=FALSE, results="asis">>=
+xtable(result.sim, booktabs=TRUE, digits=c(0, 0, 3, 3))
+@
+
+We find out that LDA and DDA perform very similar
+and we need only 9 respectively 10 features (peaks)
+for a perfect discrimination of the species.
+
+\subsection{Summary}
+
+We have shown how to identify species based on MALDI spectra using \Mq{}
+and \Rpackage{pvclust}. Additionaly we performed a variable selection using
+\Rpackage{sda} and \Rpackage{crossval} to find the minimal number of peaks for a
+perfect discriminant.
+
+\section{Session Information}
+<<sessioninfo, echo=FALSE, results="asis">>=
+toLatex(sessionInfo(), locale=FALSE)
+@
+
+\bibliographystyle{apalike}
+\bibliography{bibliography}
+
+\end{document}
