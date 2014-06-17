@@ -10,12 +10,9 @@
 \title{Species Identification using \Mq{} }
 
 \author{
-  Sebastian Gibb%
-  \thanks{\email{mail@sebastiangibb.de}}
-}
-
-\author{Korbinian Strimmer%
-  \thanks{\email{k.strimmer@imperial.ac.uk}}
+Sebastian Gibb\thanks{\email{mail@sebastiangibb.de}} {} and Korbinian Strimmer
+\thanks{\email{k.strimmer@imperial.ac.uk}}
+%
 }
 
 \date{\today}
