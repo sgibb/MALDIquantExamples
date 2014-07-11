@@ -33,7 +33,7 @@ plotImsSlice <- function(x, range, main) {
   }
 
   ## scale matrix (better contrast)
-  m <- m/max(m)
+  m <- m/max(m, na.rm=TRUE)
 
   ## build title
   main <- paste(main, " (m/z: ", range[1], "-", range[2], ")", sep="")
