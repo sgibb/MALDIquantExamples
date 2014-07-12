@@ -80,7 +80,7 @@ We use the \Rfunction{importImzMl} function provided by \MqF to import the
 
 <<import>>=
 spectra <- import("http://www.maldi-msi.org/download/imzml/s043_processed.zip",
-                  verbose=FALSE)
+                  centroided=TRUE, verbose=FALSE)
 @
 
 \subsection{Plot Image}
