@@ -68,8 +68,6 @@ suppressPackageStartupMessages(library("MALDIquantForeign"))
 <<packages>>=
 library("MALDIquant")
 library("MALDIquantForeign")
-
-library("MALDIquantExamples")
 @
 
 \subsection{Import Raw Data}
@@ -89,7 +87,8 @@ We use the same mass range as in \emph{Example 2} on
 \url{http://www.maldi-msi.org/index.php?option=com_content&view=article&id=186&Itemid=68}
 
 <<plotimage>>=
-plotImsSlice(spectra, range=c(156.95, 157.45), main="urinary bladder")
+plotImsSlice(spectra, range=c(156.95, 157.45), main="urinary bladder",
+             colRamp=colorRamp(c("black", "white")))
 @
 
 \subsection{IMS Shiny Example}

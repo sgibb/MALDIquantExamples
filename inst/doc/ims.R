@@ -17,14 +17,13 @@ suppressPackageStartupMessages(library("MALDIquantForeign"))
 library("MALDIquant")
 library("MALDIquantForeign")
 
-library("MALDIquantExamples")
-
 ## ----import--------------------------------------------------------------
 spectra <- import("http://www.maldi-msi.org/download/imzml/s043_processed.zip",
-                  verbose=FALSE)
+                  centroided=TRUE, verbose=FALSE)
 
 ## ----plotimage-----------------------------------------------------------
-plotImsSlice(spectra, range=c(156.95, 157.45), main="urinary bladder")
+plotImsSlice(spectra, range=c(156.95, 157.45), main="urinary bladder",
+             colRamp=colorRamp(c("black", "white")))
 
 ## ----sessioninfo, echo=FALSE, results="asis"-----------------------------
 toLatex(sessionInfo(), locale=FALSE)
