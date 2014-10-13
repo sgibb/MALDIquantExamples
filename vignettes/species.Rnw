@@ -22,7 +22,7 @@ Sebastian Gibb\thanks{\email{mail@sebastiangibb.de}} {} and Korbinian Strimmer
 <<knitrsetup, include=FALSE, cache=FALSE>>=
 library("knitr")
 opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
-               fig.path=file.path("figures", "bacteria/"),
+               fig.path=file.path("figures", "species/"),
                fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
 @
 
