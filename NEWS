@@ -1,6 +1,10 @@
 RELEASE HISTORY OF THE "MALDIquantExample" PACKAGE
 ==================================================
 
+Version 0.3 [2014-10-13]:
+- species vignette: use hclust.method="ward.D2" (see `?hclust` for details);
+  MALDIquantExample depends on pvclust 1.3-0 now.
+
 Version 0.2.3 [2014-08-17]:
 - adapt ims example to MALDIquant 11.1: remove plotImsSlice function which is
   now part of MALDIquant
