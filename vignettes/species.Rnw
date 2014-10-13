@@ -322,18 +322,10 @@ rownames(featureMatrix) <- paste(species, spots, sep=".")
 Now we use the \Rpackage{pvclust} package \citep{pvclust} to apply a
 hierarchical clustering analysis with bootstrapping.
 
-<<clust, eval=FALSE, fig.height=5>>=
+<<clust, fig.height=5>>=
 pv <- pvclust(t(featureMatrix),
-              method.hclust="ward",
+              method.hclust="ward.D2",
               method.dist="euclidean")
-plot(pv, print.num=FALSE)
-@
-<<clusthidden, echo=FALSE, fig.height=5>>=
-## suppress messages "ward is renamed into ward.D"; BTW we want to use ward.D2.
-## I asked the authors of pvclust to allow ward.D2.
-pv <- suppressMessages(pvclust(t(featureMatrix),
-                       method.hclust="ward",
-                       method.dist="euclidean"))
 plot(pv, print.num=FALSE)
 @
 
