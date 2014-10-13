@@ -1,7 +1,7 @@
 ## ----knitrsetup, include=FALSE, cache=FALSE------------------------------
 library("knitr")
 opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
-               fig.path=file.path("figures", "bacteria/"),
+               fig.path=file.path("figures", "species/"),
                fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
 
 ## ----setup, echo=TRUE, eval=FALSE----------------------------------------
@@ -145,18 +145,10 @@ species <- factor(species) # convert to factor
 featureMatrix <- intensityMatrix(peaks, avgSpectra)
 rownames(featureMatrix) <- paste(species, spots, sep=".")
 
-## ----clust, eval=FALSE, fig.height=5-------------------------------------
-#  pv <- pvclust(t(featureMatrix),
-#                method.hclust="ward",
-#                method.dist="euclidean")
-#  plot(pv, print.num=FALSE)
-
-## ----clusthidden, echo=FALSE, fig.height=5-------------------------------
-## suppress messages "ward is renamed into ward.D"; BTW we want to use ward.D2.
-## I asked the authors of pvclust to allow ward.D2.
-pv <- suppressMessages(pvclust(t(featureMatrix),
-                       method.hclust="ward",
-                       method.dist="euclidean"))
+## ----clust, fig.height=5-------------------------------------------------
+pv <- pvclust(t(featureMatrix),
+              method.hclust="ward.D2",
+              method.dist="euclidean")
 plot(pv, print.num=FALSE)
 
 ## ----dda, fig.height=7.5-------------------------------------------------
