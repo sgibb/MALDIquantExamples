@@ -58,7 +58,7 @@ spectra <- transformIntensity(spectra, method="sqrt")
 
 ## ----sm------------------------------------------------------------------
 spectra <- smoothIntensity(spectra, method="SavitzkyGolay",
-                           halfWindowSize=10)
+                           halfWindowSize=20)
 
 ## ----be------------------------------------------------------------------
 baseline <- estimateBaseline(spectra[[1]], method="SNIP",

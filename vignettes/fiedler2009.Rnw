@@ -157,7 +157,7 @@ In the next step we use a 21 point \emph{Savitzky-Golay}-Filter
 \citep{Savitzky1964} to smooth the spectra.
 <<sm>>=
 spectra <- smoothIntensity(spectra, method="SavitzkyGolay",
-                           halfWindowSize=10)
+                           halfWindowSize=20)
 @
 
 \subsection{Baseline Correction}
