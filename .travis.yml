@@ -18,7 +18,6 @@ r_binary_packages:
   - digest
   - sda
   - pvclust
-  - RNetCDF
   - xtable
 
 after_success:
