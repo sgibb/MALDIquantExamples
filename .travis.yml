@@ -1,0 +1,30 @@
+language: r
+warnings_are_errors: true
+
+apt_packages:
+  - libudunits2-dev
+  - libnetcdf-dev
+
+r_github_packages:
+  - jimhester/covr
+  - sgibb/MALDIquant
+  - sgibb/MALDIquantForeign
+
+r_binary_packages:
+  - testthat
+  - knitr
+  - XML
+  - base64enc
+  - digest
+  - sda
+  - pvclust
+  - RNetCDF
+  - xtable
+
+after_success:
+  - Rscript -e 'library(covr);coveralls()'
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
