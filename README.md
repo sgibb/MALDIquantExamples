@@ -1,5 +1,6 @@
 # MALDIquant Examples
 [![Build Status](https://travis-ci.org/sgibb/MALDIquantExamples.svg?branch=master)](https://travis-ci.org/sgibb/MALDIquantExamples)
+[![license](http://img.shields.io/badge/license-GPL%20%28%3E=%203%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html)
 
 This R package provides some some examples to demonstrate how to analyze
 mass spectrometry data using
