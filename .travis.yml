@@ -4,7 +4,6 @@ apt_packages:
 - libudunits2-dev
 - libnetcdf-dev
 r_github_packages:
-- jimhester/covr
 - eddelbuettel/drat
 - sgibb/MALDIquant
 - sgibb/MALDIquantForeign
