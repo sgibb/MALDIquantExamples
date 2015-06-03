@@ -78,6 +78,6 @@ getPathFiedler2009 <- function() {
                                    package="MALDIquantExamples", mustWork=TRUE)
   info <- system.file(file.path("extdata", "fiedler2009", "spectra_info.csv"),
                                 package="MALDIquantExamples", mustWork=TRUE)
-  return(c(spectra=spectra, info=info))
+  c(spectra=spectra, info=info)
 }
 
