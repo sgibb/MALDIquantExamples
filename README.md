@@ -20,7 +20,7 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 ### MALDIquant examples
 
-- [MALDIquant vignette](http://cran.r-project.org/web/packages/MALDIquant/vignettes/MALDIquant.pdf)
+- [MALDIquant vignette](http://cran.r-project.org/web/packages/MALDIquant/vignettes/MALDIquant-intro.pdf)
 
 - [Preprocessing and peak detection example - single spectrum.](https://github.com/sgibb/MALDIquant/blob/master/demo/peaks.R)
 
@@ -37,7 +37,7 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 ### MALDIquantForeign examples
 
-- [MALDIquantForeign vignette](http://cran.r-project.org/web/packages/MALDIquantForeign/vignettes/MALDIquantForeign.pdf)
+- [MALDIquantForeign vignette](http://cran.r-project.org/web/packages/MALDIquantForeign/vignettes/MALDIquantForeign-intro.pdf)
 
 ### Imaging Mass Spectrometry (IMS) examples
 
