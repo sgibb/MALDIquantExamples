@@ -153,7 +153,7 @@ and to overcome the potential dependency of the variance from the mean.
 spectra <- transformIntensity(spectra, method="sqrt")
 @
 
-In the next step we use a 21 point \emph{Savitzky-Golay}-Filter
+In the next step we use a 41 point \emph{Savitzky-Golay}-Filter
 \citep{Savitzky1964} to smooth the spectra.
 <<sm>>=
 spectra <- smoothIntensity(spectra, method="SavitzkyGolay",
