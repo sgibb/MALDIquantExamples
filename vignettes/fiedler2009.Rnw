@@ -37,6 +37,11 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
 
 \input{foreword}
 
+\input{vignettes}
+
+<<setupchild, child="setup.Rnw">>=
+@
+
 \section{Dataset}
 
 In this vignette we use the dataset described in \citet{Fiedler2009}. Please
@@ -63,34 +68,7 @@ Please see \citet{Fiedler2009} for details.
 
 \section{Analysis}
 
-\subsection{Setup}
-
-First we need to install the necessary packages (you can skip this part if
-you have already done this). You can install \Mq{} \citep{MALDIquant},
-\MqF{} \citep{MALDIquantForeign}, \Rpackage{sda}
-\citep{sda} and \Rpackage{crossval} \citep{crossval} directly from \CRAN{}.
-To install this data package from
-\url{http://github.com/sgibb/MALDIquantExamples}
-you need the \Rpackage{devtools} \citep{devtools} package.
-<<setup, echo=TRUE, eval=FALSE>>=
-install.packages(c("MALDIquant", "MALDIquantForeign",
-                   "sda", "crossval", "devtools"))
-library("devtools")
-install_github("sgibb/MALDIquantExamples")
-@
-
-Next we load the packages.
-<<loadpackages, echo=FALSE>>=
-suppressPackageStartupMessages(library("MALDIquantExamples"))
-suppressPackageStartupMessages(library("xtable"))
-@
-<<packages>>=
-library("MALDIquant")
-library("MALDIquantForeign")
-library("sda")
-library("crossval")
-
-library("MALDIquantExamples")
+<<librarychild, child="library.Rnw">>=
 @
 
 \subsection{Import Raw Data}
@@ -268,6 +246,7 @@ We finish the \Mq{} preprocessing and use the
 function of \Rpackage{sda} \citep{sda} to find the most important peaks.
 
 <<dda>>=
+library("sda")
 Xtrain <- featureMatrix
 Ytrain <- avgSpectra.info$health
 ddar <- sda.ranking(Xtrain=featureMatrix, L=Ytrain, fdr=FALSE,
@@ -310,6 +289,7 @@ Subsequently we use the \Rpackage{crossval} \citep{crossval} package to perform
 a 10-fold cross validation of these two selected peaks.
 
 <<cv>>=
+library("crossval")
 # create a prediction function for the cross validation
 predfun.dda <- function(Xtrain, Ytrain, Xtest, Ytest,
                         negative) {
