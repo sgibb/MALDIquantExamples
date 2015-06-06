@@ -1,0 +1,29 @@
+<<knitrsetup_setup, include=FALSE, cache=FALSE>>=
+library("knitr")
+opts_knit$set(self.contained=FALSE)
+@
+
+\section{Setup}
+
+Before any analysis we need to install the necessary packages
+(you can skip this part if you have already done this).
+You can install \Mq{} \citep{MALDIquant},
+\MqF{} \citep{MALDIquantForeign} directly from \CRAN{}.
+To install this data package from
+\url{https://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{drat} \citep{drat} package and add our repository to
+your installation sources. Afterwards you could install the latest version of
+\MqE{} via \Rfunction{install.packages}/\Rfunction{update.packages}:
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages("drat")
+
+## add this to your .Rprofile to make the change permanent
+drat::addRepo("sgibb")
+
+## install MALDIquantExamples package and all its dependencies
+install.packages("MALDIquantExamples")
+
+## to update to the latest version
+## (if you have installed MALDIquantExamples before)
+update.packages()
+@
