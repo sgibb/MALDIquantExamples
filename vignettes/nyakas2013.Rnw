@@ -38,7 +38,29 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
 
 \input{vignettes}
 
-<<setupchild, child="setup.Rnw">>=
+\section{Setup}
+
+Before any analysis we need to install the necessary packages
+(you can skip this part if you have already done this).
+You can install \Mq{} \citep{MALDIquant},
+\MqF{} \citep{MALDIquantForeign} directly from \CRAN{}.
+To install this data package from
+\url{https://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{drat} \citep{drat} package and add our repository to
+your installation sources. Afterwards you could install the latest version of
+\MqE{} via \Rfunction{install.packages}/\Rfunction{update.packages}:
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages("drat")
+
+## add this to your .Rprofile to make the change permanent
+drat::addRepo("sgibb")
+
+## install MALDIquantExamples package and all its dependencies
+install.packages("MALDIquantExamples")
+
+## to update to the latest version
+## (if you have installed MALDIquantExamples before)
+update.packages()
 @
 
 \section{Dataset}
@@ -51,7 +73,18 @@ of a mouse kidney.
 
 \section{Analysis}
 
-<<setupchild, child="library.Rnw">>=
+First we have to load the packages.
+<<loadpackages, echo=FALSE>>=
+suppressPackageStartupMessages(library("MALDIquantExamples"))
+@
+<<packages>>=
+## the main MALDIquant package
+library("MALDIquant")
+## the import/export routines for MALDIquant
+library("MALDIquantForeign")
+
+## example data
+library("MALDIquantExamples")
 @
 
 \subsection{Import Raw Data}

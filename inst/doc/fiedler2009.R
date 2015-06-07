@@ -4,22 +4,40 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
                fig.path=file.path("figures", "fiedler2009/"),
                fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
 
-## ----setup, echo=TRUE, eval=FALSE----------------------------------------
-#  install.packages(c("MALDIquant", "MALDIquantForeign",
-#                     "sda", "crossval", "devtools"))
-#  library("devtools")
-#  install_github("sgibb/MALDIquantExamples")
+## ----knitrsetup_setup, include=FALSE, cache=FALSE------------------------
+library("knitr")
+opts_knit$set(self.contained=FALSE)
 
-## ----loadpackages, echo=FALSE--------------------------------------------
-suppressPackageStartupMessages(library("MALDIquantExamples"))
+## ----setup, echo=TRUE, eval=FALSE----------------------------------------
+#  install.packages("drat")
+#  
+#  ## add this to your .Rprofile to make the change permanent
+#  drat::addRepo("sgibb")
+#  
+#  ## install MALDIquantExamples package and all its dependencies
+#  install.packages("MALDIquantExamples")
+#  
+#  ## to update to the latest version
+#  ## (if you have installed MALDIquantExamples before)
+#  update.packages()
+
+## ----localsetup, echo=FALSE----------------------------------------------
 suppressPackageStartupMessages(library("xtable"))
 
-## ----packages------------------------------------------------------------
-library("MALDIquant")
-library("MALDIquantForeign")
-library("sda")
-library("crossval")
+## ----knitrsetup_library, include=FALSE, cache=FALSE----------------------
+library("knitr")
+opts_knit$set(self.contained=FALSE)
 
+## ----library, echo=FALSE-------------------------------------------------
+suppressPackageStartupMessages(library("MALDIquantExamples"))
+
+## ----packages------------------------------------------------------------
+## the main MALDIquant package
+library("MALDIquant")
+## the import/export routines for MALDIquant
+library("MALDIquantForeign")
+
+## example data
 library("MALDIquantExamples")
 
 ## ----import--------------------------------------------------------------
@@ -109,6 +127,7 @@ featureMatrix <- intensityMatrix(peaks, avgSpectra)
 rownames(featureMatrix) <- avgSpectra.info$patientID
 
 ## ----dda-----------------------------------------------------------------
+library("sda")
 Xtrain <- featureMatrix
 Ytrain <- avgSpectra.info$health
 ddar <- sda.ranking(Xtrain=featureMatrix, L=Ytrain, fdr=FALSE,
@@ -135,6 +154,7 @@ hClustTop <- hclust(distanceMatrixTop, method="complete")
 plot(hClustTop, hang=-1)
 
 ## ----cv------------------------------------------------------------------
+library("crossval")
 # create a prediction function for the cross validation
 predfun.dda <- function(Xtrain, Ytrain, Xtest, Ytest,
                         negative) {

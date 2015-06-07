@@ -4,27 +4,40 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
                fig.path=file.path("figures", "species/"),
                fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
 
-## ----setup, echo=TRUE, eval=FALSE----------------------------------------
-#  install.packages(c("MALDIquant", "MALDIquantForeign", "pvclust",
-#                     "sda", "crossval", "pvclust", "devtools"))
-#  library("devtools")
-#  install_github("sgibb/MALDIquantExamples")
+## ----knitrsetup_setup, include=FALSE, cache=FALSE------------------------
+library("knitr")
+opts_knit$set(self.contained=FALSE)
 
-## ----loadpackages, echo=FALSE--------------------------------------------
-suppressPackageStartupMessages(library("MALDIquant"))
-suppressPackageStartupMessages(library("MALDIquantForeign"))
-suppressPackageStartupMessages(library("pvclust"))
-suppressPackageStartupMessages(library("sda"))
-suppressPackageStartupMessages(library("crossval"))
+## ----setup, echo=TRUE, eval=FALSE----------------------------------------
+#  install.packages("drat")
+#  
+#  ## add this to your .Rprofile to make the change permanent
+#  drat::addRepo("sgibb")
+#  
+#  ## install MALDIquantExamples package and all its dependencies
+#  install.packages("MALDIquantExamples")
+#  
+#  ## to update to the latest version
+#  ## (if you have installed MALDIquantExamples before)
+#  update.packages()
+
+## ----localsetup, echo=FALSE----------------------------------------------
 suppressPackageStartupMessages(library("xtable"))
 
-## ----packages------------------------------------------------------------
-library("MALDIquant")
-library("MALDIquantForeign")
-library("pvclust")
-library("sda")
-library("crossval")
+## ----knitrsetup_library, include=FALSE, cache=FALSE----------------------
+library("knitr")
+opts_knit$set(self.contained=FALSE)
 
+## ----library, echo=FALSE-------------------------------------------------
+suppressPackageStartupMessages(library("MALDIquantExamples"))
+
+## ----packages------------------------------------------------------------
+## the main MALDIquant package
+library("MALDIquant")
+## the import/export routines for MALDIquant
+library("MALDIquantForeign")
+
+## example data
 library("MALDIquantExamples")
 
 ## ----import--------------------------------------------------------------
@@ -146,12 +159,14 @@ featureMatrix <- intensityMatrix(peaks, avgSpectra)
 rownames(featureMatrix) <- paste(species, spots, sep=".")
 
 ## ----clust, fig.height=5-------------------------------------------------
+library("pvclust")
 pv <- pvclust(t(featureMatrix),
               method.hclust="ward.D2",
               method.dist="euclidean")
 plot(pv, print.num=FALSE)
 
 ## ----dda, fig.height=7.5-------------------------------------------------
+library("sda")
 ddar <- sda.ranking(Xtrain=featureMatrix, L=species,
                     fdr=FALSE, diagonal=TRUE)
 plot(ddar)
@@ -162,6 +177,7 @@ ldar <- sda.ranking(Xtrain=featureMatrix, L=species,
 plot(ldar)
 
 ## ----predictfuncv--------------------------------------------------------
+library("crossval")
 predfun <- function(Xtrain, Ytrain, Xtest, Ytest,
                     numVars, diagonal=FALSE) {
   # estimate ranking and determine the best numVars variables

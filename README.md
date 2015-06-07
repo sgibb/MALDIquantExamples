@@ -39,9 +39,9 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 - [MALDIquantForeign vignette](http://cran.r-project.org/web/packages/MALDIquantForeign/vignettes/MALDIquantForeign.pdf)
 
-### Imaging Mass Spectrometry (IMS) examples
+### Mass Spectrometry Imaging (MSI) examples
 
-- [Import of imzML data and image display.](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/ims.pdf?raw=true)
+- [Mass Spectrometry Imaging using MALDIquant.](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/nyakas2013.pdf?raw=true)
 
 - [MALDIquant IMS + shiny example.](https://github.com/sgibb/ims-shiny)
 
