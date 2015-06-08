@@ -55,15 +55,22 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 ## Installation
 
-[GitHub](https://github.com) is not supported by the basic `install.packages`
-command. You could use the
-[devtools](http://cran.r-project.org/web/packages/devtools/index.html) package
+[GitHub](https://github.com) is not directly supported by the basic
+`install.packages` command. You could use the
+[drat](http://dirk.eddelbuettel.com/code/drat.html) package
 to install [MALDIquantExamples](https://github.com/sgibb/MALDIquantExamples).
 
-```s
-install.packages("devtools")
-library("devtools")
-install_github("sgibb/MALDIquantExamples")
+```r
+# first install drat from CRAN if you haven't already done it:
+install.packages("drat")
+
+# add our repository
+# (add this line to your `~/.Rprofile` to add it for future use,
+#  i.e. if you want to get updates via `update.packages()` ):
+drat::addRepo("sgibb")
+
+# now use `install.packages`
+install.packages("MALDIquantExamples")
 ```
 
 ## Contact
