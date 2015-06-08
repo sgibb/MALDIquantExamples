@@ -37,6 +37,36 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
 
 \input{foreword}
 
+\input{vignettes}
+
+\section{Setup}
+
+Before any analysis we need to install the necessary packages
+(you can skip this part if you have already done this).
+You can install \Mq{} \citep{MALDIquant},
+\MqF{} \citep{MALDIquantForeign} directly from \CRAN{}.
+To install this data package from
+\url{https://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{drat} \citep{drat} package and add our repository to
+your installation sources. Afterwards you could install the latest version of
+\MqE{} via \Rfunction{install.packages}/\Rfunction{update.packages}:
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages("drat")
+
+## add this to your .Rprofile to make the change permanent
+drat::addRepo("sgibb")
+
+## install MALDIquantExamples package and all its dependencies
+install.packages("MALDIquantExamples")
+
+## to update to the latest version
+## (if you have installed MALDIquantExamples before)
+update.packages()
+@
+<<localsetup, echo=FALSE>>=
+suppressPackageStartupMessages(library("xtable"))
+@
+
 \section{Dataset}
 
 In this vignette we use the dataset described in \citet{Fiedler2009}. Please
@@ -63,33 +93,17 @@ Please see \citet{Fiedler2009} for details.
 
 \section{Analysis}
 
-\subsection{Setup}
-
-First we need to install the necessary packages (you can skip this part if
-you have already done this). You can install \Mq{} \citep{MALDIquant},
-\MqF{} \citep{MALDIquantForeign}, \Rpackage{sda}
-\citep{sda} and \Rpackage{crossval} \citep{crossval} directly from \CRAN{}.
-To install this data package from
-\url{http://github.com/sgibb/MALDIquantExamples}
-you need the \Rpackage{devtools} \citep{devtools} package.
-<<setup, echo=TRUE, eval=FALSE>>=
-install.packages(c("MALDIquant", "MALDIquantForeign",
-                   "sda", "crossval", "devtools"))
-library("devtools")
-install_github("sgibb/MALDIquantExamples")
-@
-
-Next we load the packages.
+First we have to load the packages.
 <<loadpackages, echo=FALSE>>=
 suppressPackageStartupMessages(library("MALDIquantExamples"))
-suppressPackageStartupMessages(library("xtable"))
 @
 <<packages>>=
+## the main MALDIquant package
 library("MALDIquant")
+## the import/export routines for MALDIquant
 library("MALDIquantForeign")
-library("sda")
-library("crossval")
 
+## example data
 library("MALDIquantExamples")
 @
 
@@ -153,7 +167,7 @@ and to overcome the potential dependency of the variance from the mean.
 spectra <- transformIntensity(spectra, method="sqrt")
 @
 
-In the next step we use a 21 point \emph{Savitzky-Golay}-Filter
+In the next step we use a 41 point \emph{Savitzky-Golay}-Filter
 \citep{Savitzky1964} to smooth the spectra.
 <<sm>>=
 spectra <- smoothIntensity(spectra, method="SavitzkyGolay",
@@ -268,6 +282,7 @@ We finish the \Mq{} preprocessing and use the
 function of \Rpackage{sda} \citep{sda} to find the most important peaks.
 
 <<dda>>=
+library("sda")
 Xtrain <- featureMatrix
 Ytrain <- avgSpectra.info$health
 ddar <- sda.ranking(Xtrain=featureMatrix, L=Ytrain, fdr=FALSE,
@@ -310,6 +325,7 @@ Subsequently we use the \Rpackage{crossval} \citep{crossval} package to perform
 a 10-fold cross validation of these two selected peaks.
 
 <<cv>>=
+library("crossval")
 # create a prediction function for the cross validation
 predfun.dda <- function(Xtrain, Ytrain, Xtest, Ytest,
                         negative) {

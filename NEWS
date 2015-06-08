@@ -1,6 +1,10 @@
 RELEASE HISTORY OF THE "MALDIquantExample" PACKAGE
 ==================================================
 
+Version 0.4 [2015-06-06]:
+- Add new msi vignette (nyakas2013.pdf).
+- Remove old ims.pdf vignette.
+
 Version 0.3 [2014-10-13]:
 - species vignette: use hclust.method="ward.D2" (see `?hclust` for details);
   MALDIquantExample depends on pvclust 1.3-0 now.

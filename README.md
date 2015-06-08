@@ -39,9 +39,9 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 - [MALDIquantForeign vignette](http://cran.r-project.org/web/packages/MALDIquantForeign/vignettes/MALDIquantForeign-intro.pdf)
 
-### Imaging Mass Spectrometry (IMS) examples
+### Mass Spectrometry Imaging (MSI) examples
 
-- [Import of imzML data and image display.](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/ims.pdf?raw=true)
+- [Mass Spectrometry Imaging using MALDIquant.](https://github.com/sgibb/MALDIquantExamples/blob/master/inst/doc/nyakas2013.pdf?raw=true)
 
 - [MALDIquant IMS + shiny example.](https://github.com/sgibb/ims-shiny)
 
@@ -55,15 +55,22 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 ## Installation
 
-[GitHub](https://github.com) is not supported by the basic `install.packages`
-command. You could use the
-[devtools](http://cran.r-project.org/web/packages/devtools/index.html) package
+[GitHub](https://github.com) is not directly supported by the basic
+`install.packages` command. You could use the
+[drat](http://dirk.eddelbuettel.com/code/drat.html) package
 to install [MALDIquantExamples](https://github.com/sgibb/MALDIquantExamples).
 
-```s
-install.packages("devtools")
-library("devtools")
-install_github("sgibb/MALDIquantExamples")
+```r
+# first install drat from CRAN if you haven't already done it:
+install.packages("drat")
+
+# add our repository
+# (add this line to your `~/.Rprofile` to add it for future use,
+#  i.e. if you want to get updates via `update.packages()` ):
+drat::addRepo("sgibb")
+
+# now use `install.packages`
+install.packages("MALDIquantExamples")
 ```
 
 ## Contact

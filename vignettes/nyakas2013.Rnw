@@ -1,0 +1,238 @@
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{Mass Spectrometry Imaging using MALDIquant}
+%\VignetteKeywords{Bioinformatics, Proteomics, Mass Spectrometry}
+%\VignettePackage{nyakas2013}
+
+\documentclass[12pt]{article}
+
+\input{utils}
+
+\title{\MSI{} using \Mq{} }
+
+\author{
+  Sebastian Gibb%
+  \thanks{\email{mail@sebastiangibb.de}}
+}
+\date{\today}
+
+\begin{document}
+
+<<knitrsetup, include=FALSE, cache=FALSE>>=
+library("knitr")
+opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
+               fig.path=file.path("figures", "nyakas2013/"),
+               fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
+@
+
+\maketitle
+
+\begin{abstract}
+  This vignette describes the analysis of \MSI{} data using \Mq{}\\
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+
+\input{foreword}
+
+\input{vignettes}
+
+\section{Setup}
+
+Before any analysis we need to install the necessary packages
+(you can skip this part if you have already done this).
+You can install \Mq{} \citep{MALDIquant},
+\MqF{} \citep{MALDIquantForeign} directly from \CRAN{}.
+To install this data package from
+\url{https://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{drat} \citep{drat} package and add our repository to
+your installation sources. Afterwards you could install the latest version of
+\MqE{} via \Rfunction{install.packages}/\Rfunction{update.packages}:
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages("drat")
+
+## add this to your .Rprofile to make the change permanent
+drat::addRepo("sgibb")
+
+## install MALDIquantExamples package and all its dependencies
+install.packages("MALDIquantExamples")
+
+## to update to the latest version
+## (if you have installed MALDIquantExamples before)
+update.packages()
+@
+
+\section{Dataset}
+
+The dataset we use in this vignette was kindly provided by
+Dr. Adrien Nyakas (\email{adrien.nyakas@dcb.unibe.ch};
+\url{http://dx.doi.org/10.6084/m9.figshare.735961}).
+It contains 2222 MALDI-TOF spectra (coordinates: (29, 61) to (101, 98))
+of a mouse kidney.
+
+\section{Analysis}
+
+First we have to load the packages.
+<<loadpackages, echo=FALSE>>=
+suppressPackageStartupMessages(library("MALDIquantExamples"))
+@
+<<packages>>=
+## the main MALDIquant package
+library("MALDIquant")
+## the import/export routines for MALDIquant
+library("MALDIquantForeign")
+
+## example data
+library("MALDIquantExamples")
+@
+
+\subsection{Import Raw Data}
+
+Next we use the \Rfunction{getPathNyakas2013} function to get
+the correct file path of our example data and import them into \R{}.
+<<import>>=
+## import the spectra
+spectra <- import(getPathNyakas2013(), verbose=FALSE)
+@
+
+We do a basic quality control and test whether all spectra contain the same
+number of data points and are not empty.
+
+\subsection{Preprocessing}
+
+The complete preprocessing is very similar to the default worflow for mass
+spectrometry data. Please find a more detailed description in the vignette
+\href{http://cran.r-project.org/web/packages/MALDIquant/vignettes/MALDIquant-intro.pdf}{MALDIquant
+Introduction}.
+
+<<preprocessing>>=
+spectra <- transformIntensity(spectra, method="sqrt")
+spectra <- smoothIntensity(spectra, method="SavitzkyGolay",
+                           halfWindowSize=10)
+spectra <- removeBaseline(spectra, method="SNIP",
+                          iterations=10)
+spectra <- calibrateIntensity(spectra, method="TIC")
+@
+
+\subsection{Average Spectrum}
+
+After a basic preprocessing of all spectra we produce a mean spectrum and run a
+peak detection on it to find regions of interest.
+
+<<meanspectrum>>=
+meanSpectrum <- averageMassSpectra(spectra)
+
+roi <- detectPeaks(meanSpectrum, SNR=4,
+                   halfWindowSize=10)
+
+plot(meanSpectrum, main="Mean Spectrum")
+points(roi, col="red")
+@
+
+\subsection{Plotting Slices}
+
+We want to plot a mass spectrometry image slice around the highest peak in our
+mean spectrum.
+
+<<plotmsihigh>>=
+## find order of peak intensities
+o <- order(intensity(roi), decreasing=TRUE)
+
+## plot MSI slice for the highest one
+plotMsiSlice(spectra, center=mass(roi)[o[1]], tolerance=0.5)
+@
+
+We could plot multiple slices as well.
+<<plotmsimultiple>>=
+plotMsiSlice(spectra, center=mass(roi)[o[2:3]], tolerance=0.5)
+@
+
+Another possibility would be to combine these regions of interest in one plot.
+<<plotmsicombine>>=
+plotMsiSlice(spectra, center=mass(roi)[o[1:2]], tolerance=0.5,
+             combine=TRUE,
+             colRamp=list(colorRamp(c("#000000", "#FF00FF")),
+                          colorRamp(c("#000000", "#00FF00"))))
+@
+
+\subsection{Working with slices/coordinates}
+
+Sometimes the slices should be processed further. For this purposes
+\Rfunction{msiSlices} generates an array with the dimensions x coordinates, y
+coordinates and center mass.
+<<msislices>>=
+slices <- msiSlices(spectra, center=mass(roi), tolerance=0.5)
+attributes(slices)
+@
+
+Via the \Rfunction{coordinates} method we get the pixel coordinates of our
+spectra. Use the argument \Rfunction{adjust} to set the minimal values to 1.
+<<coordinates>>=
+head(coordinates(spectra))
+head(coordinates(spectra, adjust=TRUE))
+@
+
+\subsection{Clustering}
+
+While we could highlight some mass values in our slices we sometimes want to do
+some clustering to get information about the spatial order.
+
+Therefore we build a peak intensity matrix first.
+<<peakim>>=
+peaks <- detectPeaks(spectra, SNR=3,
+                     halfWindowSize=10)
+peaks <- binPeaks(peaks)
+intMatrix <- intensityMatrix(peaks, spectra)
+@
+
+Subsequently we run a \Rfunction{kmeans} clustering with 3 centers. We choose 3
+centers because the kidney is divided in 2 main anatomical parts, the renal
+cortex (the outer part) and the renal medulla (the inner part, containing the
+renal pyramids).
+<<kmeans>>=
+km <- kmeans(intMatrix, centers=2)
+@
+
+For visualisation we create a new matrix and replace each coordinate by its
+cluster number.
+<<clustermatrix>>=
+coord <- coordinates(spectra, adjust=TRUE)
+maxPixels <- apply(coord, MARGIN=2, FUN=max)
+m <- matrix(NA, nrow=maxPixels["x"], ncol=maxPixels["y"])
+m[coord] <- km$cluster
+@
+
+In the following step we use the \Rfunction{plotMsiSlice} function again to plot
+our cluster matrix. Now we use the argument \Rfunction{scale=FALSE} to avoid the
+scaling to values between 0 and 1. Also we provide an own \Rfunction{colRamp}
+function that returns red or green for the clusters 1, and 2 respectively
+(must generated the same matrix output as \Rfunction{graphics::colorRamp}).
+<<plotclusters>>=
+rgbCluster <- function(x) {
+  col <- matrix(c(255, 0, 0,
+                  0, 255, 0), nrow=2, byrow=TRUE)
+  col[x, ]
+}
+plotMsiSlice(m, colRamp=rgbCluster, scale=FALSE)
+@
+
+Please note that the base \Rfunction{kmeans} doesn't respect any spatial
+information.
+
+\subsection{Summary}
+
+While the default \MSI{} workflow is very similar to the default profile spectra
+workflow (and could be found in a detailed discussion in the other \Mq{}
+vignettes) we demonstrate typical \MSI{} functions like plotting slices and
+clustering data.
+
+\section{Session Information}
+<<sessioninfo, echo=FALSE, results="asis">>=
+toLatex(sessionInfo(), locale=FALSE)
+@
+
+\bibliographystyle{apalike}
+\bibliography{bibliography}
+
+\end{document}

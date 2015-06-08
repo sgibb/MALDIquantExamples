@@ -38,6 +38,36 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
 
 \input{foreword}
 
+\input{vignettes}
+
+\section{Setup}
+
+Before any analysis we need to install the necessary packages
+(you can skip this part if you have already done this).
+You can install \Mq{} \citep{MALDIquant},
+\MqF{} \citep{MALDIquantForeign} directly from \CRAN{}.
+To install this data package from
+\url{https://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{drat} \citep{drat} package and add our repository to
+your installation sources. Afterwards you could install the latest version of
+\MqE{} via \Rfunction{install.packages}/\Rfunction{update.packages}:
+<<setup, echo=TRUE, eval=FALSE>>=
+install.packages("drat")
+
+## add this to your .Rprofile to make the change permanent
+drat::addRepo("sgibb")
+
+## install MALDIquantExamples package and all its dependencies
+install.packages("MALDIquantExamples")
+
+## to update to the latest version
+## (if you have installed MALDIquantExamples before)
+update.packages()
+@
+<<localsetup, echo=FALSE>>=
+suppressPackageStartupMessages(library("xtable"))
+@
+
 \section{Dataset}
 
 The dataset we use in this vignette was kindly provided by
@@ -48,39 +78,17 @@ three technical replicates.
 
 \section{Analysis}
 
-\subsection{Setup}
-
-First we need to install the necessary packages (you can skip this part if
-you have already done this). You can install \Mq{} \citep{MALDIquant},
-\MqF{} \citep{MALDIquantForeign}, \Rpackage{pvclust} \citep{pvclust},
-\Rpackage{sda} \citep{sda} and \Rpackage{crossval} \citep{crossval}
-directly from \CRAN{}.
-To install this data package from
-\url{http://github.com/sgibb/MALDIquantExamples}
-you need the \Rpackage{devtools} \citep{devtools} package.
-<<setup, echo=TRUE, eval=FALSE>>=
-install.packages(c("MALDIquant", "MALDIquantForeign", "pvclust",
-                   "sda", "crossval", "pvclust", "devtools"))
-library("devtools")
-install_github("sgibb/MALDIquantExamples")
-@
-
-Next we load the packages.
+First we have to load the packages.
 <<loadpackages, echo=FALSE>>=
-suppressPackageStartupMessages(library("MALDIquant"))
-suppressPackageStartupMessages(library("MALDIquantForeign"))
-suppressPackageStartupMessages(library("pvclust"))
-suppressPackageStartupMessages(library("sda"))
-suppressPackageStartupMessages(library("crossval"))
-suppressPackageStartupMessages(library("xtable"))
+suppressPackageStartupMessages(library("MALDIquantExamples"))
 @
 <<packages>>=
+## the main MALDIquant package
 library("MALDIquant")
+## the import/export routines for MALDIquant
 library("MALDIquantForeign")
-library("pvclust")
-library("sda")
-library("crossval")
 
+## example data
 library("MALDIquantExamples")
 @
 
@@ -323,6 +331,7 @@ Now we use the \Rpackage{pvclust} package \citep{pvclust} to apply a
 hierarchical clustering analysis with bootstrapping.
 
 <<clust, fig.height=5>>=
+library("pvclust")
 pv <- pvclust(t(featureMatrix),
               method.hclust="ward.D2",
               method.dist="euclidean")
@@ -336,6 +345,7 @@ function of \Rpackage{sda} \citep{sda} to find the peaks that are typical
 for a specific species.
 
 <<dda, fig.height=7.5>>=
+library("sda")
 ddar <- sda.ranking(Xtrain=featureMatrix, L=species,
                     fdr=FALSE, diagonal=TRUE)
 plot(ddar)
@@ -366,6 +376,7 @@ The prediction function combines the model creation, the prediction
 and the comparison between the true and the predicted results.
 
 <<predictfuncv>>=
+library("crossval")
 predfun <- function(Xtrain, Ytrain, Xtest, Ytest,
                     numVars, diagonal=FALSE) {
   # estimate ranking and determine the best numVars variables

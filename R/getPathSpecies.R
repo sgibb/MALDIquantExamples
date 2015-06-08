@@ -23,6 +23,5 @@
 getPathSpecies <- function() {
   spectra <- system.file(file.path("extdata", "species", "spectra.tar.gz"),
                                    package="MALDIquantExamples", mustWork=TRUE)
-  return(setNames(spectra, "spectra"))
+  setNames(spectra, "spectra")
 }
-
