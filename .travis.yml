@@ -4,7 +4,6 @@ apt_packages:
 - libudunits2-dev
 - libnetcdf-dev
 r_github_packages:
-- eddelbuettel/drat
 - sgibb/MALDIquant
 - sgibb/MALDIquantForeign
 r_binary_packages:
@@ -16,12 +15,7 @@ r_binary_packages:
 - sda
 - pvclust
 - xtable
-after_success:
-- test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy.sh
 notifications:
   email:
     on_success: change
     on_failure: change
-env:
-  global:
-    secure: YRD1ZOpJ6OPcS+xtUb6sS9wXeu9jkHJkqMn0PE7I+aDnNkLZ/exj+LmKnV57d0fC5TdZQw0Iv8ILztOl/g3OL2rysuDoE3sHyfmlDXaoX6zPRT0Ac4FjDQVFMUetDw7d0guDPjIdwmLcKKsQ+OXn7x4aJA5YLZTWqnNgjuKhc+A=
