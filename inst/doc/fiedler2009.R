@@ -4,32 +4,15 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
                fig.path=file.path("figures", "fiedler2009/"),
                fig.align="center", fig.height=4.25, comment=NA, prompt=FALSE)
 
-## ----knitrsetup_setup, include=FALSE, cache=FALSE------------------------
-library("knitr")
-opts_knit$set(self.contained=FALSE)
-
 ## ----setup, echo=TRUE, eval=FALSE----------------------------------------
-#  install.packages("drat")
-#  
-#  ## add this to your .Rprofile to make the change permanent
-#  drat::addRepo("sgibb")
-#  
-#  ## install MALDIquantExamples package and all its dependencies
-#  install.packages("MALDIquantExamples")
-#  
-#  ## to update to the latest version
-#  ## (if you have installed MALDIquantExamples before)
-#  update.packages()
+#  install.packages(c("MALDIquant", "MALDIquantForeign",
+#                     "sda", "crossval", "devtools"))
+#  library("devtools")
+#  install_github("sgibb/MALDIquantExamples")
 
-## ----localsetup, echo=FALSE----------------------------------------------
-suppressPackageStartupMessages(library("xtable"))
-
-## ----knitrsetup_library, include=FALSE, cache=FALSE----------------------
-library("knitr")
-opts_knit$set(self.contained=FALSE)
-
-## ----library, echo=FALSE-------------------------------------------------
+## ----loadpackages, echo=FALSE--------------------------------------------
 suppressPackageStartupMessages(library("MALDIquantExamples"))
+suppressPackageStartupMessages(library("xtable"))
 
 ## ----packages------------------------------------------------------------
 ## the main MALDIquant package

@@ -45,22 +45,13 @@ Before any analysis we need to install the necessary packages
 You can install \Mq{} \citep{MALDIquant},
 \MqF{} \citep{MALDIquantForeign} directly from \CRAN{}.
 To install this data package from
-\url{https://github.com/sgibb/MALDIquantExamples}
-you need the \Rpackage{drat} \citep{drat} package and add our repository to
-your installation sources. Afterwards you could install the latest version of
-\MqE{} via \Rfunction{install.packages}/\Rfunction{update.packages}:
+\url{http://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{devtools} \citep{devtools} package.
 <<setup, echo=TRUE, eval=FALSE>>=
-install.packages("drat")
-
-## add this to your .Rprofile to make the change permanent
-drat::addRepo("sgibb")
-
-## install MALDIquantExamples package and all its dependencies
-install.packages("MALDIquantExamples")
-
-## to update to the latest version
-## (if you have installed MALDIquantExamples before)
-update.packages()
+install.packages(c("MALDIquant", "MALDIquantForeign",
+                   "devtools"))
+library("devtools")
+install_github("sgibb/MALDIquantExamples")
 @
 
 \section{Dataset}

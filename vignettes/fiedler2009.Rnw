@@ -44,27 +44,16 @@ opts_chunk$set(width=40, tidy.opts=list(width.cutoff=45), tidy=FALSE,
 Before any analysis we need to install the necessary packages
 (you can skip this part if you have already done this).
 You can install \Mq{} \citep{MALDIquant},
-\MqF{} \citep{MALDIquantForeign} directly from \CRAN{}.
+\MqF{} \citep{MALDIquantForeign}, \Rpackage{sda}
+\citep{sda} and \Rpackage{crossval} \citep{crossval} directly from \CRAN{}.
 To install this data package from
-\url{https://github.com/sgibb/MALDIquantExamples}
-you need the \Rpackage{drat} \citep{drat} package and add our repository to
-your installation sources. Afterwards you could install the latest version of
-\MqE{} via \Rfunction{install.packages}/\Rfunction{update.packages}:
+\url{http://github.com/sgibb/MALDIquantExamples}
+you need the \Rpackage{devtools} \citep{devtools} package.
 <<setup, echo=TRUE, eval=FALSE>>=
-install.packages("drat")
-
-## add this to your .Rprofile to make the change permanent
-drat::addRepo("sgibb")
-
-## install MALDIquantExamples package and all its dependencies
-install.packages("MALDIquantExamples")
-
-## to update to the latest version
-## (if you have installed MALDIquantExamples before)
-update.packages()
-@
-<<localsetup, echo=FALSE>>=
-suppressPackageStartupMessages(library("xtable"))
+install.packages(c("MALDIquant", "MALDIquantForeign",
+                   "sda", "crossval", "devtools"))
+library("devtools")
+install_github("sgibb/MALDIquantExamples")
 @
 
 \section{Dataset}
@@ -96,6 +85,7 @@ Please see \citet{Fiedler2009} for details.
 First we have to load the packages.
 <<loadpackages, echo=FALSE>>=
 suppressPackageStartupMessages(library("MALDIquantExamples"))
+suppressPackageStartupMessages(library("xtable"))
 @
 <<packages>>=
 ## the main MALDIquant package
