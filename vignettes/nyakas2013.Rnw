@@ -87,9 +87,6 @@ the correct file path of our example data and import them into \R{}.
 spectra <- import(getPathNyakas2013(), verbose=FALSE)
 @
 
-We do a basic quality control and test whether all spectra contain the same
-number of data points and are not empty.
-
 \subsection{Preprocessing}
 
 The complete preprocessing is very similar to the default worflow for mass
