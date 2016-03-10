@@ -1,20 +1,18 @@
 language: r
+sudo: false
+cache: packages
 warnings_are_errors: true
-apt_packages:
-- libudunits2-dev
-- libnetcdf-dev
-r_github_packages:
-- sgibb/MALDIquant
-- sgibb/MALDIquantForeign
-r_binary_packages:
-- testthat
-- knitr
-- XML
-- base64enc
-- digest
-- sda
-- pvclust
-- xtable
+addon:
+  apt:
+    packages:
+      - libudunits2-dev
+      - libnetcdf-dev
+
+r:
+#  - oldrel
+  - release
+  - devel
+
 notifications:
   email:
     on_success: change
