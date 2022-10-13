@@ -1,10 +1,10 @@
 # MALDIquant Examples
 [![Build Status](https://travis-ci.org/sgibb/MALDIquantExamples.svg?branch=master)](https://travis-ci.org/sgibb/MALDIquantExamples)
-[![license](http://img.shields.io/badge/license-GPL%20%28%3E=%203%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html)
+[![license](https://img.shields.io/badge/license-GPL%20%28%3E=%203%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html)
 
 This R package provides some some examples to demonstrate how to analyze
 mass spectrometry data using
-[MALDIquant](http://strimmerlab.org/software/maldiquant/).
+[MALDIquant](https://strimmerlab.github.io/software/maldiquant/index.html).
 
 ## Description
 
@@ -14,13 +14,13 @@ such as TopHat or SNIP, peak alignment using warping functions,
 handling of replicated measurements as well as allowing spectra with
 different resolutions.
 
-Please visit: http://strimmerlab.org/software/maldiquant/
+Please visit: https://strimmerlab.github.io/software/maldiquant/index.html
 
 ## Details
 
 ### MALDIquant examples
 
-- [MALDIquant vignette](http://cran.r-project.org/web/packages/MALDIquant/vignettes/MALDIquant-intro.pdf)
+- [MALDIquant vignette](https://cran.r-project.org/web/packages/MALDIquant/vignettes/MALDIquant-intro.pdf)
 
 - [Preprocessing and peak detection example - single spectrum.](https://github.com/sgibb/MALDIquant/blob/master/demo/peaks.R)
 
@@ -37,7 +37,7 @@ Please visit: http://strimmerlab.org/software/maldiquant/
 
 ### MALDIquantForeign examples
 
-- [MALDIquantForeign vignette](http://cran.r-project.org/web/packages/MALDIquantForeign/vignettes/MALDIquantForeign-intro.pdf)
+- [MALDIquantForeign vignette](https://cran.r-project.org/web/packages/MALDIquantForeign/vignettes/MALDIquantForeign-intro.pdf)
 
 ### Mass Spectrometry Imaging (MSI) examples
 
